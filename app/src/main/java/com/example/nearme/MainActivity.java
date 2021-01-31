@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 if(Signup.isValid(phone)){
-                  //  Toast.makeText(MainActivity.this, "HERE Boi", Toast.LENGTH_SHORT).show();
+                 //  Toast.makeText(MainActivity.this, "HERE Boi", Toast.LENGTH_SHORT).show();
                     callbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                         @Override
                         public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
