@@ -23,7 +23,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class Signup extends AppCompatActivity {
@@ -31,6 +34,8 @@ public class Signup extends AppCompatActivity {
     PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
     String tempOTP=null;
     PhoneAuthCredential globalCredential;
+    FirebaseDatabase db = FirebaseDatabase.getInstance();
+    private DatabaseReference root = db.getReference().child("users");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -57,8 +62,34 @@ public class Signup extends AppCompatActivity {
                         @Override
                         public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
                             Toast.makeText(Signup.this, "Signed up", Toast.LENGTH_SHORT).show();
+//                            root.child("phno").setValue(phoneNo.getText().toString());
+//                            root.child("name").setValue(name.getText().toString());
+//                            root.child("occupation").setValue(occupation.getText().toString());
                             globalCredential = phoneAuthCredential;
-                            performLogin(Signup.this,phoneAuthCredential,myAuth);
+                            myAuth.signInWithCredential(phoneAuthCredential).addOnCompleteListener(Signup.this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if(task.isSuccessful()){
+                                        Toast.makeText(Signup.this, "Logged In successfully", Toast.LENGTH_SHORT).show();
+                          //Toast.makeText(Signup.this, "HEre", Toast.LENGTH_SHORT).show();
+                                        FirebaseUser user = myAuth.getCurrentUser();
+                                        Log.i("Phno",user.getPhoneNumber());
+                                        DatabaseReference newUser = root.child(user.getPhoneNumber());
+                                        newUser.child("phno").setValue(phoneNo.getText().toString());
+                                        newUser.child("name").setValue(name.getText().toString());
+                                        newUser.child("occupation").setValue(occupation.getText().toString());
+                                        globalCredential = null;
+                                        FirebaseUser currentUser = myAuth.getCurrentUser();
+                                        Log.i("check new here",currentUser.toString());
+                                    }
+                                    else {
+                                        Toast.makeText(Signup.this, "Failed ", Toast.LENGTH_SHORT).show();
+                                        Log.i("FireBaseLogin Error",task.getException().toString());
+
+
+                                    }
+                                }
+                            });
                             globalCredential=null;
                             FirebaseUser currentUser = myAuth.getCurrentUser();
                             Log.i("check new here",currentUser.toString());
@@ -119,11 +150,33 @@ public class Signup extends AppCompatActivity {
                 if(isValid(otpForVerify)){
                     PhoneAuthCredential credential= PhoneAuthProvider.getCredential(tempOTP,otpForVerify.getText().toString());
                     globalCredential = credential;
-                   if( performLogin(Signup.this,credential,myAuth)){
-                       globalCredential = null;
-                       FirebaseUser currentUser = myAuth.getCurrentUser();
-                       Log.i("check new here",currentUser.toString());
-                   }
+
+                    myAuth.signInWithCredential(credential).addOnCompleteListener(Signup.this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if(task.isSuccessful()){
+                                Toast.makeText(Signup.this, "Logged In successfully", Toast.LENGTH_SHORT).show();
+                                FirebaseUser user = myAuth.getCurrentUser();
+                                Log.i("Phno",user.getPhoneNumber());
+                                DatabaseReference newUser = root.child(user.getPhoneNumber());
+                                newUser.child("phno").setValue(phoneNo.getText().toString());
+                                newUser.child("name").setValue(name.getText().toString());
+                                newUser.child("occupation").setValue(occupation.getText().toString());
+                                globalCredential = null;
+
+
+                            }
+                            else {
+                                Toast.makeText(Signup.this, "Failed ", Toast.LENGTH_SHORT).show();
+                                Log.i("FireBaseLogin Error",task.getException().toString());
+
+
+                            }
+                        }
+                    });
+
+
+
 
                 }
 
@@ -148,31 +201,36 @@ public class Signup extends AppCompatActivity {
         return true;
     }
 
-    public static boolean performLogin(final Activity context, PhoneAuthCredential myCred, final FirebaseAuth mAuth){
-        final boolean[] isOK = {false};
-
-        mAuth.signInWithCredential(myCred).addOnCompleteListener(context, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    Toast.makeText(context, "Logged In successfully", Toast.LENGTH_SHORT).show();
-                    FirebaseUser currentUser= mAuth.getCurrentUser();
-                    Log.i("check new here",currentUser.toString());
-
-
-                    isOK[0] = true;
-
-                }
-                else {
-                    Toast.makeText(context, "Failed ", Toast.LENGTH_SHORT).show();
-                    Log.i("FireBaseLogin Error",task.getException().toString());
-                    isOK[0] = false;
-                }
-            }
-        });
-
-            return isOK[0];
-    }
+//    public static boolean performLogin(final Activity context, PhoneAuthCredential myCred, final FirebaseAuth mAuth){
+//        final boolean[] isOK = new boolean[1];
+//        final CountDownLatch done = new CountDownLatch(1);
+//
+//        mAuth.signInWithCredential(myCred).addOnCompleteListener(context, new OnCompleteListener<AuthResult>() {
+//            @Override
+//            public void onComplete(@NonNull Task<AuthResult> task) {
+//                if(task.isSuccessful()){
+//                    Toast.makeText(context, "Logged In successfully", Toast.LENGTH_SHORT).show();
+//
+//                    isOK[0] = true;
+//                    Log.i("BOOLEAN here 1",Boolean.toString(isOK[0]));
+//                    done.countDown();
+//                }
+//                else {
+//                    Toast.makeText(context, "Failed ", Toast.LENGTH_SHORT).show();
+//                    Log.i("FireBaseLogin Error",task.getException().toString());
+//                    isOK[0] = false;
+//
+//                }
+//            }
+//        });
+//
+//        try {
+//            done.await();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        } Log.i("BOOLEAN here",Boolean.toString(isOK[0]));
+//            return isOK[0];
+//    }
 
 
 }
