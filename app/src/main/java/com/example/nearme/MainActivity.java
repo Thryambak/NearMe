@@ -9,6 +9,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,10 +21,18 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,14 +40,23 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth myAuth;
     PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks ;
     String code= null;
+    private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("users");
     PhoneAuthCredential phoneAuthCredentials =null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         myAuth = FirebaseAuth.getInstance();
+
+        FirebaseUser f = myAuth.getCurrentUser();
+        if(f!=null){
+            Intent intent = new Intent(getApplicationContext(),HomePage.class);
+            startActivity(intent);
+            finish();
+        }
         String s = "New To NearMe? Signup.";
         SpannableString ss = new SpannableString(s);
         ClickableSpan cs = new ClickableSpan() {
@@ -68,45 +86,90 @@ public class MainActivity extends AppCompatActivity {
 
 
                 if(Signup.isValid(phone)){
-                 //  Toast.makeText(MainActivity.this, "HERE Boi", Toast.LENGTH_SHORT).show();
-                    callbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                    ValueEventListener valueEventListener = new ValueEventListener() {
                         @Override
-                        public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
-                            super.onCodeSent(s, forceResendingToken);
-                            code= s;
-                            otp.setVisibility(View.VISIBLE);
-                            submitOtp.setVisibility(View.VISIBLE);
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                            List<Post> userList = new ArrayList<>();
+
+                            for(DataSnapshot dataValues:snapshot.getChildren()){
+                                Post myuser = dataValues.getValue(Post.class);
+                                userList.add(myuser);
+                                int i=0;
+                                for(i=0;i<userList.size();i++){
+                                    if(userList.get(i).getPhno().equals(phone.getText().toString())){
+                                        //  Toast.makeText(MainActivity.this, "HERE Boi", Toast.LENGTH_SHORT).show();
+                                        callbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                                            @Override
+                                            public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
+                                                super.onCodeSent(s, forceResendingToken);
+                                                code= s;
+                                                otp.setVisibility(View.VISIBLE);
+                                                submitOtp.setVisibility(View.VISIBLE);
+
+                                            }
+
+                                            @Override
+                                            public void onCodeAutoRetrievalTimeOut(@NonNull String s) {
+                                                super.onCodeAutoRetrievalTimeOut(s);
+                                            }
+
+                                            @Override
+                                            public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
+                                                phoneAuthCredentials= phoneAuthCredential;
+                                                otp.setVisibility(View.VISIBLE);
+                                                submitOtp.setVisibility(View.VISIBLE);
+                                                Toast.makeText(MainActivity.this, "Signup Successfull", Toast.LENGTH_SHORT).show();
+                                                Intent intent = new Intent(getApplicationContext(),HomePage.class);
+                                                startActivity(intent);
+                                                finish();
+
+                                            }
+
+                                            @Override
+                                            public void onVerificationFailed(@NonNull FirebaseException e) {
+                                                Toast.makeText(MainActivity.this, "Verification failed", Toast.LENGTH_SHORT).show();
+
+                                            }
+                                        };
+
+                                        PhoneAuthOptions phoneAuthOptions =  PhoneAuthOptions
+                                                .newBuilder(myAuth)
+                                                .setPhoneNumber("+91"+phone.getText().toString())
+                                                .setCallbacks(callbacks)
+                                                .setActivity(MainActivity.this)
+                                                .setTimeout(10L, TimeUnit.SECONDS)
+                                                .build();
+                                        PhoneAuthProvider.verifyPhoneNumber(phoneAuthOptions);
+
+
+
+
+                                        break;
+
+                                    }
+
+
+
+                                }
+                                if(i==userList.size()){
+                                    Toast.makeText(MainActivity.this, "You aren't registered. Please Sign up", Toast.LENGTH_SHORT).show();
+
+
+                                }
+
+
+                            }
 
                         }
 
                         @Override
-                        public void onCodeAutoRetrievalTimeOut(@NonNull String s) {
-                            super.onCodeAutoRetrievalTimeOut(s);
-                        }
-
-                        @Override
-                        public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
-                            phoneAuthCredentials= phoneAuthCredential;
-                            otp.setVisibility(View.VISIBLE);
-                            submitOtp.setVisibility(View.VISIBLE);
-
-                        }
-
-                        @Override
-                        public void onVerificationFailed(@NonNull FirebaseException e) {
-                            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-
+                        public void onCancelled(@NonNull DatabaseError error) {
+                                    Log.i("DBRead","FAiled");
                         }
                     };
+                    databaseReference.addValueEventListener(valueEventListener);
 
-                    PhoneAuthOptions phoneAuthOptions =  PhoneAuthOptions
-                            .newBuilder(myAuth)
-                            .setPhoneNumber("+91"+phone.getText().toString())
-                            .setCallbacks(callbacks)
-                            .setActivity(MainActivity.this)
-                            .setTimeout(10L, TimeUnit.SECONDS)
-                            .build();
-                    PhoneAuthProvider.verifyPhoneNumber(phoneAuthOptions);
 
 
 
@@ -126,9 +189,13 @@ public class MainActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if(task.isSuccessful()){
                                     Toast.makeText(MainActivity.this, "Signup Successfull", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(getApplicationContext(),HomePage.class);
+                                    startActivity(intent);
+                                    finish();
+
                                 }
                                 else {
-                                    Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MainActivity.this, "Incorrect OTP!", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });

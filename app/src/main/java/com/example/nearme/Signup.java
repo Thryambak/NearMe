@@ -30,6 +30,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class Signup extends AppCompatActivity {
+//    private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("users");
     FirebaseAuth myAuth;
     PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
     String tempOTP=null;
