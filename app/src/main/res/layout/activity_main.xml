@@ -28,6 +28,7 @@
         android:ems="10"
         android:hint="Phone-No"
         android:inputType="none|number"
+        android:maxLength="10"
         android:textAlignment="center"
         android:textColorHint="#FAFAFA"
         app:layout_constraintEnd_toEndOf="parent"

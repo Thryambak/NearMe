@@ -85,7 +85,7 @@ public class Signup extends AppCompatActivity {
                                     }
                                     else {
                                         Toast.makeText(Signup.this, "Failed ", Toast.LENGTH_SHORT).show();
-                                        Log.i("FireBaseLogin Error",task.getException().toString());
+                                      //  Log.i("FireBaseLogin Error",task.getException().toString());
 
 
                                     }
@@ -93,7 +93,7 @@ public class Signup extends AppCompatActivity {
                             });
                             globalCredential=null;
                             FirebaseUser currentUser = myAuth.getCurrentUser();
-                            Log.i("check new here",currentUser.toString());
+                          //  Log.i("check new here",currentUser.toString());
                         }
 
                        @Override

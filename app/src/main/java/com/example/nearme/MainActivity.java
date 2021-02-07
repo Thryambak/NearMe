@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
+    int i=0;
 
     FirebaseAuth myAuth;
     PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks ;
@@ -95,10 +96,13 @@ public class MainActivity extends AppCompatActivity {
                             for(DataSnapshot dataValues:snapshot.getChildren()){
                                 Post myuser = dataValues.getValue(Post.class);
                                 userList.add(myuser);
-                                int i=0;
-                                for(i=0;i<userList.size();i++){
-                                    if(userList.get(i).getPhno().equals(phone.getText().toString())){
-                                        //  Toast.makeText(MainActivity.this, "HERE Boi", Toast.LENGTH_SHORT).show();
+
+                                for(int j=0;j<userList.size();j++){
+                                    if(userList.get(j).getPhno().equals(phone.getText().toString())){
+
+                                        i=-1;Log.i("check if Exist in Db ",Integer.toString(i));
+
+                                       // Toast.makeText(MainActivity.this, "HERE Boi", Toast.LENGTH_SHORT).show();
                                         callbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                                             @Override
                                             public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
@@ -152,11 +156,20 @@ public class MainActivity extends AppCompatActivity {
 
 
                                 }
-                                if(i==userList.size()){
-                                    Toast.makeText(MainActivity.this, "You aren't registered. Please Sign up", Toast.LENGTH_SHORT).show();
+                                try {
+                                    Thread.sleep(2000);
+                                    if(i==0){
+
+                                        Log.i("checking i == -1 On ",Integer.toString(i));
+                                        Toast.makeText(MainActivity.this, "You aren't registered. Please Sign up", Toast.LENGTH_SHORT).show();
 
 
+                                    }
+                                    i=0;
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
                                 }
+
 
 
                             }
@@ -188,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if(task.isSuccessful()){
-                                    Toast.makeText(MainActivity.this, "Signup Successfull", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MainActivity.this, "Login Successfull", Toast.LENGTH_SHORT).show();
                                     Intent intent = new Intent(getApplicationContext(),HomePage.class);
                                     startActivity(intent);
                                     finish();
