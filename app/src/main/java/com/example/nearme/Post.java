@@ -1,7 +1,8 @@
 package com.example.nearme;
 
 public class Post {
-    String name,occupation,phno;
+   private String name,occupation,phno;
+    String isAvailable = null;
 
     public String getName() {
         return name;
@@ -13,5 +14,9 @@ public class Post {
 
     public String getPhno() {
         return phno;
+    }
+
+    public String getIsAvailable() {
+        return isAvailable;
     }
 }

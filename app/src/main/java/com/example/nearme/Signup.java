@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -79,6 +80,11 @@ public class Signup extends AppCompatActivity {
                                         newUser.child("phno").setValue(phoneNo.getText().toString());
                                         newUser.child("name").setValue(name.getText().toString());
                                         newUser.child("occupation").setValue(occupation.getText().toString());
+                                        newUser.child("isAvailable").setValue("false");
+                                        Intent intent = new Intent(getApplicationContext(),HomePage.class);
+                                        startActivity(intent);
+                                        finish();
+
                                         globalCredential = null;
                                         FirebaseUser currentUser = myAuth.getCurrentUser();
                                         Log.i("check new here",currentUser.toString());
@@ -163,7 +169,11 @@ public class Signup extends AppCompatActivity {
                                 newUser.child("phno").setValue(phoneNo.getText().toString());
                                 newUser.child("name").setValue(name.getText().toString());
                                 newUser.child("occupation").setValue(occupation.getText().toString());
+                                newUser.child("isAvailable").setValue("false");
                                 globalCredential = null;
+                                Intent intent = new Intent(getApplicationContext(),HomePage.class);
+                                startActivity(intent);
+                                finish();
 
 
                             }

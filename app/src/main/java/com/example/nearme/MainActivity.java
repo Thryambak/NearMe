@@ -47,12 +47,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         myAuth = FirebaseAuth.getInstance();
 
         FirebaseUser f = myAuth.getCurrentUser();
+
         if(f!=null){
             Intent intent = new Intent(getApplicationContext(),HomePage.class);
             startActivity(intent);
