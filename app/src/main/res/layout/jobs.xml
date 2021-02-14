@@ -9,6 +9,7 @@
         android:id="@+id/findJobs"
         android:layout_width="145dp"
         android:layout_height="88dp"
+        android:background="#151212"
         android:text="Start Finding jobs"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

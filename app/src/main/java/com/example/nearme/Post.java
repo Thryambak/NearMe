@@ -1,7 +1,15 @@
 package com.example.nearme;
 
 public class Post {
-   private String name,occupation,phno;
+   private String name;
+    private String occupation;
+    private String phno;
+
+    public String getLocation() {
+        return location;
+    }
+
+    private String location;
     String isAvailable = null;
 
     public String getName() {
