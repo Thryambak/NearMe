@@ -4,12 +4,23 @@ public class Post {
    private String name;
     private String occupation;
     private String phno;
+    private Double lat;
 
-    public String getLocation() {
-        return location;
+    public Double getLat() {
+        return lat;
     }
 
-    private String location;
+    public Double getLongi() {
+        return longi;
+    }
+
+    private Double  longi;
+   // private Location location;
+//    public Location getLocation() {
+//        return location;
+//    }
+
+
     String isAvailable = null;
 
     public String getName() {

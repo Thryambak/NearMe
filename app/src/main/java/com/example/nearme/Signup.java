@@ -81,7 +81,8 @@ public class Signup extends AppCompatActivity {
                                         newUser.child("name").setValue(name.getText().toString());
                                         newUser.child("occupation").setValue(occupation.getText().toString());
                                         newUser.child("isAvailable").setValue("false");
-                                        newUser.child("location").setValue("null");
+                                        newUser.child("lat").setValue("");
+                                        newUser.child("longi").setValue("");
                                         Intent intent = new Intent(getApplicationContext(),HomePage.class);
                                         startActivity(intent);
                                         finish();
@@ -171,7 +172,8 @@ public class Signup extends AppCompatActivity {
                                 newUser.child("name").setValue(name.getText().toString());
                                 newUser.child("occupation").setValue(occupation.getText().toString());
                                 newUser.child("isAvailable").setValue("false");
-                                newUser.child("location").setValue("null");
+                                newUser.child("lat").setValue("");
+                                newUser.child("longi").setValue("");
                                 globalCredential = null;
                                 Intent intent = new Intent(getApplicationContext(),HomePage.class);
                                 startActivity(intent);

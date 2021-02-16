@@ -1,9 +1,17 @@
 package com.example.nearme;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,17 +31,39 @@ import com.google.firebase.database.ValueEventListener;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 public class JobFragment extends Fragment {
 
 
-    Location location ;
+    @Nullable Location location = null ;
+    final Looper looper = null;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference().child("users");
     public  Boolean isLookingForJob;
-
+   LocationListener locationListener;
+   LocationManager locationManager;
+Criteria criteria = new Criteria();
     public JobFragment() {
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (permissions.length > 0) {
+            if (requestCode == 0) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED) {
+
+                        //get location
+
+                        locationManager.requestSingleUpdate(criteria, locationListener, looper);
+                    }
+                }
+
+            }
+        }
     }
 
     @Override
@@ -44,6 +74,40 @@ public class JobFragment extends Fragment {
         FirebaseAuth myAuth = FirebaseAuth.getInstance();
         FirebaseUser user = myAuth.getCurrentUser();
         final String myNo = user.getPhoneNumber();
+
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+              myRef.child(myNo).child("lat").setValue(location.getLatitude());
+                myRef.child(myNo).child("longi").setValue(location.getLongitude());
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                Log.i("LAt","Status changed");
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+                Log.i("LAt","provider enable");
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+                Log.i("LAt","provider disabled");
+
+            }
+        };
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+        criteria.setSpeedRequired(false);
+        criteria.setCostAllowed(true);
+        criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
+        criteria.setVerticalAccuracy(Criteria.ACCURACY_HIGH);
 
 
 
@@ -93,6 +157,11 @@ public class JobFragment extends Fragment {
                     myRef.child(myNo).child("isAvailable").setValue("true");
                     findJobs.setText("Stop Searching");
                     findJobs.setBackgroundColor(Color.parseColor("#cc0000"));
+                    if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED){
+
+                       locationManager.requestSingleUpdate(criteria,locationListener,looper);
+                    }
+                    else ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},0);
                 }
                 else
                     myRef.child(myNo).child("isAvailable").setValue("false");
@@ -105,12 +174,7 @@ public class JobFragment extends Fragment {
     }
 
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-     //   Toast.makeText(getContext(), "Hello there", Toast.LENGTH_SHORT).show();
 
-    }
 
     @Nullable
     @Override
