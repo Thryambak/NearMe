@@ -117,9 +117,9 @@ Criteria criteria = new Criteria();
             public void onDataChange(@NonNull DataSnapshot snapshot) {
              //  isAvail avail  =  snapshot.child("isAvailable").getValue(isAvail.class);
 
-               Post post = snapshot.getValue(Post.class);
+                   Post post = snapshot.getValue(Post.class);
 
-                    Toast.makeText(getContext(), "MMMM "+post.getIsAvailable().toString(), Toast.LENGTH_LONG).show();
+             //       Toast.makeText(getContext(), "MMMM "+post.getIsAvailable().toString(), Toast.LENGTH_LONG).show();
                     if(post.getIsAvailable().equals("true")) {
                         isLookingForJob = true;
                         findJobs.setText("Stop Searching");
