@@ -4,7 +4,9 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -28,6 +30,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -42,6 +49,7 @@ public class JobFragment extends Fragment {
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference().child("users");
     public  Boolean isLookingForJob;
+   public Geocoder geocoder;
    LocationListener locationListener;
    LocationManager locationManager;
 Criteria criteria = new Criteria();
@@ -70,6 +78,7 @@ Criteria criteria = new Criteria();
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         final Button findJobs = getView().findViewById(R.id.findJobs);
+        geocoder = new Geocoder(getActivity(), Locale.ENGLISH);
 
         FirebaseAuth myAuth = FirebaseAuth.getInstance();
         FirebaseUser user = myAuth.getCurrentUser();
@@ -80,6 +89,15 @@ Criteria criteria = new Criteria();
             public void onLocationChanged(Location location) {
               myRef.child(myNo).child("lat").setValue(location.getLatitude());
                 myRef.child(myNo).child("longi").setValue(location.getLongitude());
+                List<Address> addresses = new ArrayList<Address>();
+                try {
+                    addresses = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
+
+                    myRef.child(myNo).child("city").setValue(addresses.get(0).getLocality());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
 
             @Override

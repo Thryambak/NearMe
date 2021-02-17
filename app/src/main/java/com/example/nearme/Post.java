@@ -5,6 +5,11 @@ public class Post {
     private String occupation;
     private String phno;
     private Double lat;
+    private String city;
+
+    public String getCity() {
+        return city;
+    }
 
     public Double getLat() {
         return lat;

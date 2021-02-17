@@ -34,7 +34,7 @@ public class ProfileFragment extends Fragment {
                 myAuth.signOut();
                 Intent intent = new Intent(getContext(),MainActivity.class);
                 startActivity(intent);
-                Log.i("is done?","YES");
+              //  Log.i("is done?","YES");
                 getActivity().finish();
 
 
