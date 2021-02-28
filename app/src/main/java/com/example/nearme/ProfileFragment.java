@@ -6,7 +6,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,19 +30,25 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Button button = view.findViewById(R.id.signOut);
-        button.setOnClickListener(new View.OnClickListener() {
+        String[] myS = {"Log out","View My Profile"};
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getContext(),R.layout.settings_row,myS);
+        ListView listView = view.findViewById(R.id.listSettings);
+        listView.setAdapter(arrayAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                myAuth.signOut();
-                Intent intent = new Intent(getContext(),MainActivity.class);
-                startActivity(intent);
-              //  Log.i("is done?","YES");
-                getActivity().finish();
-
-
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(position == 0 ) {
+                    myAuth.signOut();
+                    Intent intent = new Intent(getContext(), MainActivity.class);
+                    startActivity(intent);
+                    //  Log.i("is done?","YES");
+                    getActivity().finish();
+                }
             }
         });
+
+
     }
 
     @Nullable

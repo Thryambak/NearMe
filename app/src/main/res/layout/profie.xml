@@ -6,20 +6,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
-
-
-
-        <Button
-            android:id="@+id/signOut"
+        <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="44dp"
-            android:text="Sign out"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/listSettings"
+
+            />
+
+
+
+
 
 
 </LinearLayout>

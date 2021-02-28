@@ -50,6 +50,11 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        Intent gpsOptionsIntent = new Intent(
+//                android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//        startActivity(gpsOptionsIntent);
+
+
 
         myAuth = FirebaseAuth.getInstance();
 

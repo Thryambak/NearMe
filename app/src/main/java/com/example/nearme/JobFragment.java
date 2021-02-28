@@ -2,6 +2,8 @@ package com.example.nearme;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -13,6 +15,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +41,7 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -48,7 +52,7 @@ public class JobFragment extends Fragment {
     final Looper looper = null;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference().child("users");
-    public  Boolean isLookingForJob;
+    public  Boolean isLookingForJob = false;
    public Geocoder geocoder;
    LocationListener locationListener;
    LocationManager locationManager;
@@ -78,7 +82,9 @@ Criteria criteria = new Criteria();
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         final Button findJobs = getView().findViewById(R.id.findJobs);
-        geocoder = new Geocoder(getActivity(), Locale.ENGLISH);
+        geocoder = new Geocoder(getActivity(), Locale.getDefault());
+
+
 
         FirebaseAuth myAuth = FirebaseAuth.getInstance();
         FirebaseUser user = myAuth.getCurrentUser();
@@ -128,6 +134,53 @@ Criteria criteria = new Criteria();
         criteria.setVerticalAccuracy(Criteria.ACCURACY_HIGH);
 
 
+//        boolean gps_enabled=false;boolean network_enabled=false;
+//        try {
+//            gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+//        } catch(Exception ex) {}
+//
+//
+//        try {
+//            network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+//        } catch(Exception ex) {}
+//
+//        while(!gps_enabled && !network_enabled) {
+//            try {
+//                gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+//            } catch(Exception ex) {}
+//
+//
+//            try {
+//                network_enabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+//            } catch(Exception ex) {}
+//
+//            if(gps_enabled||network_enabled)
+//                break;
+//            try {
+//                Thread.currentThread().wait(5000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//
+//
+//            // notify user
+//            new AlertDialog.Builder(view.getContext())
+//                    .setMessage("please enable GPS")
+//                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+//                            getContext().startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+//                        }
+//                    })
+//                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            getActivity().finish();
+//                            System.exit(0);
+//                        }
+//                    })
+//                    .show();
+//        }
 
          myRef.child(myNo).addValueEventListener(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
